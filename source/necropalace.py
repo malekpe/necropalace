@@ -253,6 +253,8 @@ def main():
             case.libre = False
             case.refresh
             refresh(grille, blue, red)
+        else:
+            refresh(grille, blue, red)
         return statue
 
     def refresh(grille, blue, red):
@@ -323,13 +325,12 @@ def main():
                     cible = coup2(player, grille)
 
             if event.type == MOUSEBUTTONUP:
-                if statue["move"] and mouse == case:
-                    cible = list()
-                    refresh(grille,blue,red)
-                    purple = coup1(player, grille)
                 x,y = pygame.mouse.get_pos()
                 case = caseFinder(grille, x, y)
                 if mouse == case and statue["move"]:
+                    cible = list()
+                    refresh(grille,blue,red)
+                    purple = coup1(player, grille)
                     statue = move(statue, player, case, purple, grille, blue, red)
                 if mouse == player.case and case != mouse and statue["fire"]:
                     statue = fire(statue, player, case, cible, grille, blue, red)
@@ -340,6 +341,7 @@ def main():
                         statue["fire"] = False
                         cible = list()
                         refresh(grille,blue,red)
+                
         pygame.display.update()
 
 main()
