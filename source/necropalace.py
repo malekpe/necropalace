@@ -24,12 +24,12 @@ def main():
     for i in range(0, e_hauteur, 64):
         lignes=pygame.Rect(0,i,e_largeur,1)
         pygame.draw.rect(fenetre,(0,0,0),lignes)
-    
+
     class Case:
         def __init__(self, x, y):
             self.co = (x, y)
             self.libre = True
-        
+
         def __repr__(self):
             data = {"co":self.co, "libre":self.libre}
             return str(data)
@@ -62,7 +62,7 @@ def main():
             self.color = color
             self.iconObjet = pygame.image.load(f"{color}.png")
 
-        
+
         def __repr__(self):
             data = {"couleur":self.color, "co":self.case.co, "libre":self.case.libre}
             return str(data)
@@ -70,167 +70,46 @@ def main():
         def refresh(self):
             fenetre.blit(self.iconObjet,self.case.co)
             self.case.libre = False
-        
-        def scanMove(self, grille):
-            purple = []
+
+        def scanNearby(self, grille, block):
+            nearby = []
             x,y = self.case.coGrille()
-            try:
-                if grille[y-1][x].libre and y-1 >= 0:
-                    purple.append(grille[y-1][x])
-                    if grille[y-2][x].libre and y-2 >= 0:
-                        purple.append(grille[y-2][x])
-            except:
-                pass
-
-            try:
-                if grille[y-1][x+1].libre and y-1 >= 0:
-                    purple.append(grille[y-1][x+1])
-                    if grille[y-2][x+2].libre and y-2 >= 0:
-                        purple.append(grille[y-2][x+2])
-            except:
-                pass
-
-            try:
-                if grille[y][x+1].libre:
-                    purple.append(grille[y][x+1])
-                    if grille[y][x+2].libre:
-                        purple.append(grille[y][x+2])
-            except:
-                pass
-
-            try:
-                if grille[y+1][x+1].libre:
-                    purple.append(grille[y+1][x+1])
-                    if grille[y+2][x+2].libre:
-                        purple.append(grille[y+2][x+2])
-            except:
-                pass
-
-            try:
-                if grille[y+1][x].libre:
-                    purple.append(grille[y+1][x])
-                    if grille[y+2][x].libre:
-                        purple.append(grille[y+2][x])
-            except:
-                pass
-
-            try:
-                if grille[y+1][x-1].libre and x-1 >= 0:
-                    purple.append(grille[y+1][x-1])
-                    if grille[y+2][x-2].libre and x-2 >= 0:
-                        purple.append(grille[y+2][x-2])
-            except:
-                pass
-
-            try:
-                if grille[y][x-1].libre and x-1 >= 0:
-                    purple.append(grille[y][x-1])
-                    if grille[y][x-2].libre and x-2 >= 0:
-                        purple.append(grille[y][x-2])
-            except:
-                pass
-
-            try:
-                if grille[y-1][x-1].libre and y-1 >= 0 and x-1 >= 0:
-                    purple.append(grille[y-1][x-1])
-                    if grille[y-2][x-2].libre and y-2 >= 0 and x-2 >= 0:
-                        purple.append(grille[y-2][x-2])
-            except:
-                pass
-            return purple
-
-        def scanFire(self, grille):
-            cible = []
-            x,y = self.case.coGrille()
-            try:
-                if grille[y-1][x].libre and y-1 >= 0:
-                    cible.append(grille[y-1][x])
-                if grille[y-2][x].libre and y-2 >= 0:
-                    cible.append(grille[y-2][x])
-            except:
-                pass
-
-            try:
-                if grille[y-1][x+1].libre and y-1 >= 0:
-                    cible.append(grille[y-1][x+1])
-                if grille[y-2][x+2].libre and y-2 >= 0:
-                    cible.append(grille[y-2][x+2])
-            except:
-                pass
-
-            try:
-                if grille[y][x+1].libre:
-                    cible.append(grille[y][x+1])
-                if grille[y][x+2].libre:
-                    cible.append(grille[y][x+2])
-            except:
-                pass
-
-            try:
-                if grille[y+1][x+1].libre:
-                    cible.append(grille[y+1][x+1])
-                if grille[y+2][x+2].libre:
-                    cible.append(grille[y+2][x+2])
-            except:
-                pass
-
-            try:
-                if grille[y+1][x].libre:
-                    cible.append(grille[y+1][x])
-                if grille[y+2][x].libre:
-                    cible.append(grille[y+2][x])
-            except:
-                pass
-
-            try:
-                if grille[y+1][x-1].libre and x-1 >= 0:
-                    cible.append(grille[y+1][x-1])
-                if grille[y+2][x-2].libre and x-2 >= 0:
-                    cible.append(grille[y+2][x-2])
-            except:
-                pass
-
-            try:
-                if grille[y][x-1].libre and x-1 >= 0:
-                    cible.append(grille[y][x-1])
-                if grille[y][x-2].libre and x-2 >= 0:
-                    cible.append(grille[y][x-2])
-            except:
-                pass
-
-            try:
-                if grille[y-1][x-1].libre and y-1 >= 0 and x-1 >= 0:
-                    cible.append(grille[y-1][x-1])
-                if grille[y-2][x-2].libre and y-2 >= 0 and x-2 >= 0:
-                    cible.append(grille[y-2][x-2])
-            except:
-                pass
-            return cible
+            for diff_x in range(-1,2):
+                for diff_y in range(-1,2):
+                    if diff_x == 0 and diff_y == 0:
+                        continue
+                    for n in range(1,3):
+                        cell_x = x + diff_x * n
+                        cell_y = y + diff_y * n
+                        if cell_x < 0 or cell_y < 0 or cell_x >= nbx or cell_y >= nby:
+                            continue
+                        if grille[y+diff_y*n][x+diff_x*n].libre:
+                            nearby.append(grille[y+diff_y*n][x+diff_x*n])
+                        elif block:
+                            break
+            return nearby
 
     def caseFinder(grille, x, y):
-        while x not in range(0, e_largeur, 64):
-            x -= 1
-        while y not in range(0, e_hauteur, 64):
-            y -= 1
-        x,y = int(x/64),int(y/64)
+        x = x//64
+        y = y//64
         return grille[y][x]
 
     def coup1(player, grille):
-        purple = player.scanMove(grille)
+        purple = player.scanNearby(grille, True)
         for case in purple:
             x,y = case.co
             #draw=pygame.Rect(x,y,64,64)
             #pygame.draw.rect(fenetre,(148,0,211),draw)
             pygame.draw.circle(fenetre, (148,0,211), (x+32, y+32), 30)
         return purple
-    
+
     def coup2(player, grille):
-        cible = player.scanFire(grille)
+        cible = player.scanNearby(grille, False)
         for case in cible:
             x,y = case.co
             pygame.draw.circle(fenetre, (220,10,30), (x+32, y+32), 30)
         return cible
-    
+
     def move(statue, player, case, purple, grille, blue, red):
         if len(purple) == 0:
                 if player.color == "blue":
@@ -245,7 +124,7 @@ def main():
             player.refresh()
             refresh(grille, blue, red)
         return statue
-    
+
     def fire(statue, player, case, cible, grille, blue, red):
         if case in cible:
             statue["fire"] = False
@@ -261,7 +140,7 @@ def main():
         for ligne in grille:
             for case in ligne:
                 case.refresh(blue, red)
-    
+
     def gameUpdate(statue, player, blue, red, grille, purple, cible):
         if statue["fire"] and not statue["move"]:
             cible = coup2(player, grille)
@@ -295,12 +174,12 @@ def main():
 
     blue.refresh()
     red.refresh()
-            
+
     for i in range(0):
         y,x = randint(0,11),randint(0,7)
         if grille[y][x].libre:
             grille[y][x].libre=False
-    
+
     for ligne in grille:
         for case in ligne:
             case.refresh(blue,red)
@@ -314,34 +193,33 @@ def main():
 
     while True:
         statue, player, purple, cible = gameUpdate(statue, player, blue, red, grille, purple, cible)
-        for event in pygame.event.get():
-            if event.type == QUIT:
-                pygame.quit()
-                quit()
-            if event.type == MOUSEBUTTONDOWN:
-                x,y = pygame.mouse.get_pos()
-                mouse = caseFinder(grille, x, y)
-                if mouse == player.case and statue["fire"]:
-                    cible = coup2(player, grille)
+        pygame.display.update()
+        event = pygame.event.wait()
+        if event.type == QUIT:
+            pygame.quit()
+            quit()
+        if event.type == MOUSEBUTTONDOWN:
+            x,y = pygame.mouse.get_pos()
+            mouse = caseFinder(grille, x, y)
+            if mouse == player.case and statue["fire"]:
+                cible = coup2(player, grille)
 
-            if event.type == MOUSEBUTTONUP:
-                x,y = pygame.mouse.get_pos()
-                case = caseFinder(grille, x, y)
-                if mouse == case and statue["move"]:
+        if event.type == MOUSEBUTTONUP:
+            x,y = pygame.mouse.get_pos()
+            case = caseFinder(grille, x, y)
+            if mouse == case and statue["move"]:
+                cible = list()
+                refresh(grille,blue,red)
+                purple = coup1(player, grille)
+                statue = move(statue, player, case, purple, grille, blue, red)
+            if mouse == player.case and case != mouse and statue["fire"]:
+                statue = fire(statue, player, case, cible, grille, blue, red)
+                if statue["move"]:
+                    purple = coup1(player, grille)
+            if dbclock.tick() < DOUBLECLICKTIME:
+                if mouse == player.case and case == mouse and not statue["move"]:
+                    statue["fire"] = False
                     cible = list()
                     refresh(grille,blue,red)
-                    purple = coup1(player, grille)
-                    statue = move(statue, player, case, purple, grille, blue, red)
-                if mouse == player.case and case != mouse and statue["fire"]:
-                    statue = fire(statue, player, case, cible, grille, blue, red)
-                    if statue["move"]:
-                        purple = coup1(player, grille)
-                if dbclock.tick() < DOUBLECLICKTIME:
-                    if mouse == player.case and case == mouse and not statue["move"]:
-                        statue["fire"] = False
-                        cible = list()
-                        refresh(grille,blue,red)
-                
-        pygame.display.update()
 
 main()
